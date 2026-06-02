@@ -184,7 +184,7 @@ export default function App() {
 
     return (
       <header style={navHeaderStyle}>
-        <div style={{ fontWeight: 'bold', fontSize: '1.2rem', color: '#1e5631' }}>EduPlatform</div>
+        <div style={{ fontWeight: 'bold', fontSize: '1.2rem', color: '#1e5631' }}>Climate Academy</div>
         <nav style={{ display: 'flex', gap: '20px', alignItems: 'center' }}>
           <button onClick={() => { setView('home'); setActiveModuleId(null); }} style={navLinkStyle(view === 'home')}>Home</button>
           <button onClick={() => { setView('quizzes'); setActiveModuleId(null); }} style={navLinkStyle(view === 'quizzes')}>Quizzes</button>
@@ -231,7 +231,7 @@ export default function App() {
         
         {view === 'home' && (
           <div style={{ textAlign: 'center', padding: '60px 0' }}>
-            <h1 style={{ fontSize: '2.5rem', color: '#1e5631' }}>Welcome to EduPlatform</h1>
+            <h1 style={{ fontSize: '2.5rem', color: '#1e5631' }}>Welcome to Climate Academy</h1>
             <p style={{ color: '#666', fontSize: '1.2rem', marginBottom: '30px', maxWidth: '600px', margin: '0 auto 30px auto' }}>
               Access our library of high-quality learning modules. Course criteria and evaluation assessments are loaded completely dynamically.
             </p>
