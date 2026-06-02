@@ -258,7 +258,7 @@ export default function App() {
               {TEAM_MEMBERS.map((member) => (
                 <div key={member.id} style={teamCardStyle}>
                   <img 
-                    src={member.photo} 
+                    src={`${import.meta.env.BASE_URL}${member.photo}`} 
                     alt={member.name} 
                     style={teamPhotoStyle} 
                   />
