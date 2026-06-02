@@ -26,8 +26,18 @@ export default function App() {
   const [pageInputVal, setPageInputVal] = useState('1'); 
   const [zoomLevel, setZoomLevel] = useState(100);
 
+  // Responsive Screen State
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+
   const viewerContainerRef = useRef(null);
   const pageRefs = useRef({}); 
+
+  // Track screen size changes to make layouts scale smoothly
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth <= 768);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   // Map the single active course module object
   const activeModule = COURSE_MODULES.find(m => m.id === activeModuleId);
@@ -183,16 +193,27 @@ export default function App() {
     const [isAboutHovered, setIsAboutHovered] = useState(false);
 
     return (
-      <header style={navHeaderStyle}>
+      <header style={{
+        ...navHeaderStyle,
+        flexDirection: isMobile ? 'column' : 'row',
+        gap: isMobile ? '15px' : '0',
+        padding: isMobile ? '15px 20px' : '12px 40px'
+      }}>
         <div style={{ fontWeight: 'bold', fontSize: '1.2rem', color: '#1e5631' }}>Climate Academy</div>
-        <nav style={{ display: 'flex', gap: '20px', alignItems: 'center' }}>
+        <nav style={{ 
+          display: 'flex', 
+          gap: isMobile ? '10px' : '20px', 
+          alignItems: 'center',
+          flexWrap: 'wrap',
+          justifyContent: 'center'
+        }}>
           <button onClick={() => { setView('home'); setActiveModuleId(null); }} style={navLinkStyle(view === 'home')}>Home</button>
           <button onClick={() => { setView('quizzes'); setActiveModuleId(null); }} style={navLinkStyle(view === 'quizzes')}>Quizzes</button>
           
           <div 
             style={{ position: 'relative' }}
-            onMouseEnter={() => setIsAboutHovered(true)}
-            onMouseLeave={() => setIsAboutHovered(false)}
+            onMouseEnter={() => !isMobile && setIsAboutHovered(true)}
+            onMouseLeave={() => !isMobile && setIsAboutHovered(false)}
           >
             <button 
               onClick={() => setIsAboutHovered(!isAboutHovered)} 
@@ -202,7 +223,13 @@ export default function App() {
             </button>
             
             {isAboutHovered && (
-              <div style={dropdownMenuStyle}>
+              <div style={{
+                ...dropdownMenuStyle,
+                position: isMobile ? 'static' : 'absolute',
+                boxShadow: isMobile ? 'none' : '0 4px 6px rgba(0,0,0,0.1)',
+                border: isMobile ? 'none' : '1px solid #e0e0e0',
+                backgroundColor: isMobile ? '#f9fafb' : '#ffffff'
+              }}>
                 <button 
                   onClick={() => { setView('mission'); setActiveModuleId(null); setIsAboutHovered(false); }} 
                   style={dropdownItemStyle}
@@ -227,12 +254,12 @@ export default function App() {
     <div style={pageBgStyle}>
       <Navbar />
 
-      <div style={{ maxWidth: '1000px', margin: '0 auto', padding: '0 20px' }}>
+      <div style={{ maxWidth: '1000px', margin: '0 auto', padding: isMobile ? '0 12px' : '0 20px' }}>
         
         {view === 'home' && (
-          <div style={{ textAlign: 'center', padding: '60px 0' }}>
-            <h1 style={{ fontSize: '2.5rem', color: '#1e5631' }}>Welcome to Climate Academy</h1>
-            <p style={{ color: '#666', fontSize: '1.2rem', marginBottom: '30px', maxWidth: '600px', margin: '0 auto 30px auto' }}>
+          <div style={{ textAlign: 'center', padding: isMobile ? '30px 0' : '60px 0' }}>
+            <h1 style={{ fontSize: isMobile ? '1.8rem' : '2.5rem', color: '#1e5631', padding: '0 10px' }}>Welcome to Climate Academy</h1>
+            <p style={{ color: '#666', fontSize: isMobile ? '1rem' : '1.2rem', marginBottom: '30px', maxWidth: '600px', margin: '15px auto 30px auto', lineHeight: '1.5' }}>
               Access our library of high-quality learning modules. Course criteria and evaluation assessments are loaded completely dynamically.
             </p>
             <button onClick={() => setView('quizzes')} style={primaryBtnStyle}>
@@ -242,7 +269,7 @@ export default function App() {
         )}
 
         {view === 'mission' && (
-          <div style={{ ...cardStyle, padding: '40px' }}>
+          <div style={{ ...cardStyle, padding: isMobile ? '20px' : '40px' }}>
             <h2 style={{ color: '#1e5631', marginTop: 0 }}>Our Mission</h2>
             <p style={{ lineHeight: '1.6', color: '#444' }}>
               Our mission is to provide accessible, high-quality education to everyone, everywhere.
@@ -251,8 +278,8 @@ export default function App() {
         )}
 
         {view === 'team' && (
-          <div style={{ ...cardStyle, padding: '40px' }}>
-            <h2 style={{ color: '#1e5631', marginTop: 0, textAlign: 'center', marginBottom: '40px' }}>Meet Our Team</h2>
+          <div style={{ ...cardStyle, padding: isMobile ? '20px' : '40px' }}>
+            <h2 style={{ color: '#1e5631', marginTop: 0, textAlign: 'center', marginBottom: isMobile ? '20px' : '40px' }}>Meet Our Team</h2>
             
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '30px' }}>
               {TEAM_MEMBERS.map((member) => (
@@ -283,7 +310,15 @@ export default function App() {
                 const hasStarted = savedData && Object.keys(JSON.parse(savedData)).length > 0;
 
                 return (
-                  <div key={`${module.id}-${refreshKey}`} style={{ ...cardStyle, display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 0 }}>
+                  <div key={`${module.id}-${refreshKey}`} style={{ 
+                    ...cardStyle, 
+                    display: 'flex', 
+                    flexDirection: isMobile ? 'column' : 'row',
+                    alignItems: isMobile ? 'stretch' : 'center',
+                    justifyContent: 'space-between', 
+                    gap: isMobile ? '15px' : '20px',
+                    marginBottom: 0 
+                  }}>
                     <div>
                       <h3 style={{ margin: '0 0 8px 0', color: '#222' }}>{module.title}</h3>
                       <p style={{ margin: '0 0 10px 0', color: '#666', fontSize: '0.95rem' }}>{module.description}</p>
@@ -295,10 +330,10 @@ export default function App() {
                         <span style={{ color: '#666', fontSize: '0.85rem', fontWeight: 'bold' }}>○ Not Started</span>
                       )}
                     </div>
-                    <div style={{ display: 'flex', gap: '10px' }}>
+                    <div style={{ display: 'flex', gap: '10px', justifyContent: isMobile ? 'flex-start' : 'flex-end' }}>
                       <button 
                         onClick={() => { setActiveModuleId(module.id); setView('quiz-runner'); }}
-                        style={primaryBtnStyle}
+                        style={{ ...primaryBtnStyle, flex: isMobile ? 1 : 'none', textAlign: 'center' }}
                       >
                         {isFinal ? 'View Results' : hasStarted ? 'Resume' : 'Start'}
                       </button>
@@ -323,8 +358,8 @@ export default function App() {
           return (
             <div style={{ animation: 'fadeIn 0.3s ease' }}>
               
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
-                <button onClick={closeModule} style={backBtnStyle}>← Back to Courses</button>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px', gap: '10px' }}>
+                <button onClick={closeModule} style={backBtnStyle}>← Back</button>
                 <button onClick={() => handleResetModule(activeModule.id)} style={resetOutlineBtnStyle}>Reset Progress</button>
               </div>
 
@@ -332,10 +367,10 @@ export default function App() {
                 <span style={{ fontSize: '1rem', fontWeight: 'bold', color: '#1e5631' }}>
                   {isFinalSubmitted 
                     ? `Module Completed` 
-                    : `Quiz Progress: ${answeredQuestions} of ${totalQuestions} Answered`}
+                    : `Quiz Progress: ${answeredQuestions} of ${totalQuestions}`}
                 </span>
               </div>
-              <div style={{ display: 'flex', gap: '8px', marginBottom: '25px' }}>
+              <div style={{ display: 'flex', gap: '4px', marginBottom: '25px' }}>
                 {Array.from({ length: totalQuestions }).map((_, idx) => (
                   <div 
                     key={idx} 
@@ -351,13 +386,13 @@ export default function App() {
               </div>
 
               {isFinalSubmitted ? (
-                <div style={{ ...cardStyle, textAlign: 'center', padding: '50px 20px' }}>
+                <div style={{ ...cardStyle, textAlign: 'center', padding: isMobile ? '30px 15px' : '50px 20px' }}>
                   <h1 style={{ color: '#1e5631', fontSize: '2rem', marginBottom: '10px' }}>Results</h1>
                   <p style={{ fontSize: '1.2rem', color: '#444' }}>
                     You scored <strong>{calculateScore()}</strong> out of <strong>{totalQuestions}</strong>
                   </p>
                   
-                  <div style={{ marginTop: '30px', textAlign: 'left', background: '#f9fafb', padding: '20px', borderRadius: '8px', display: 'inline-block', maxWidth: '600px', width: '100%' }}>
+                  <div style={{ marginTop: '30px', textAlign: 'left', background: '#f9fafb', padding: isMobile ? '15px' : '20px', borderRadius: '8px', display: 'inline-block', maxWidth: '600px', width: '100%', boxSizing: 'border-box' }}>
                     <h3 style={{ marginTop: 0, color: '#333' }}>Review:</h3>
                     {currentQuestions.map((q, i) => {
                       const userAns = selectedOptions[q.id];
@@ -377,7 +412,7 @@ export default function App() {
                   </div>
 
                   <div style={{ marginTop: '30px' }}>
-                    <button onClick={closeModule} style={primaryBtnStyle}>Return to Course Library</button>
+                    <button onClick={closeModule} style={{ ...primaryBtnStyle, width: isMobile ? '100%' : 'auto' }}>Return to Course Library</button>
                   </div>
                 </div>
               ) : (
@@ -390,7 +425,7 @@ export default function App() {
                   <div style={{ ...cardStyle, padding: 0, overflow: 'hidden', backgroundColor: '#333b42' }}>
                     
                     {/* Toolbar */}
-                    <div style={viewerToolbarStyle}>
+                    <div style={{ ...viewerToolbarStyle, flexDirection: isMobile ? 'column' : 'row', gap: isMobile ? '10px' : '0', padding: '10px 16px' }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.85rem', color: '#bbb' }}>
                         <span>Page</span>
                         <input
@@ -426,11 +461,15 @@ export default function App() {
                     </div>
 
                     {/* Canvas Container Layout */}
-                    <div style={{ display: 'flex', minHeight: '400px', backgroundColor: '#4b5563' }}>
+                    <div style={{ display: 'flex', minHeight: '350px', backgroundColor: '#4b5563' }}>
                       
                       <div 
                         ref={viewerContainerRef}
-                        style={{ ...slideContentCanvasStyle, overflowY: 'auto' }}
+                        style={{ 
+                          ...slideContentCanvasStyle, 
+                          padding: isMobile ? '15px 8px' : '30px 20px',
+                          overflowY: 'auto' 
+                        }}
                       >
                         {activeModule && activeModule.pdfUrl ? (
                           <div style={{ 
@@ -446,7 +485,7 @@ export default function App() {
                             <Document
                               file={activeModule.pdfUrl}
                               onLoadSuccess={({ numPages }) => setNumPages(numPages)}
-                              loading={<div style={{ color: '#fff', padding: '20px' }}>Loading PDF Document...</div>}
+                              loading={<div style={{ color: '#fff', padding: '20px' }}>Loading PDF...</div>}
                             >
                               {Array.from(new Array(numPages), (el, idx) => (
                                 <TrackedPdfPage 
@@ -456,6 +495,7 @@ export default function App() {
                                   rootRef={viewerContainerRef}
                                   pageRefs={pageRefs}
                                   setCurrentPageIdx={setCurrentPageIdx}
+                                  isMobile={isMobile}
                                 />
                               ))}
                             </Document>
@@ -467,35 +507,43 @@ export default function App() {
                     </div>
                   </div>
 
-                  <div style={cardStyle}>
+                  <div style={{ ...cardStyle, padding: isMobile ? '16px' : '24px' }}>
                     <h2 style={{ color: '#1e5631', marginTop: 0, marginBottom: '20px', borderBottom: '1px solid #eee', paddingBottom: '10px' }}>
                       Quiz Questions
                     </h2>
 
                     {isLoadingQuiz ? (
-                      <p style={{ color: '#666', fontStyle: 'italic' }}>Loading quiz dataset from storage array matrices...</p>
+                      <p style={{ color: '#666', fontStyle: 'italic' }}>Loading quiz dataset...</p>
                     ) : totalQuestions === 0 ? (
                       <p style={{ color: '#666', fontStyle: 'italic' }}>No questions detected or failed to reach structural source file mapping paths.</p>
                     ) : (
                       currentQuestions.map((q, index) => {
                         return (
                           <div key={q.id} style={{ marginBottom: '30px' }}>
-                            <p style={{ fontWeight: '500', fontSize: '1.05rem', marginBottom: '12px', color: '#222' }}>
+                            <p style={{ fontWeight: '500', fontSize: '1.05rem', marginBottom: '12px', color: '#222', lineHeight: '1.4' }}>
                               {index + 1}. {q.text}
                             </p>
                             
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', paddingLeft: '10px', marginBottom: '15px' }}>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', paddingLeft: isMobile ? '2px' : '10px', marginBottom: '15px' }}>
                               {q.options && q.options.map((option) => (
-                                <label key={option} style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: isFinalSubmitted ? 'not-allowed' : 'pointer', color: '#444' }}>
+                                <label key={option} style={{ 
+                                  display: 'flex', 
+                                  alignItems: 'flex-start', 
+                                  gap: '10px', 
+                                  cursor: isFinalSubmitted ? 'not-allowed' : 'pointer', 
+                                  color: '#444',
+                                  fontSize: '0.95rem',
+                                  lineHeight: '1.3'
+                                }}>
                                   <input 
                                     type="radio" 
                                     name={`module-${activeModule.id}-q-${q.id}`} 
                                     checked={selectedOptions[q.id] === option}
                                     disabled={isFinalSubmitted}
                                     onChange={() => handleOptionChange(q.id, option)}
-                                    style={{ accentColor: '#1e5631', width: '16px', height: '16px' }}
+                                    style={{ accentColor: '#1e5631', width: '18px', height: '18px', marginTop: '1px', flexShrink: 0 }}
                                   />
-                                  {option}
+                                  <span style={{ paddingTop: '1px' }}>{option}</span>
                                 </label>
                               ))}
                             </div>
@@ -507,9 +555,9 @@ export default function App() {
                     )}
 
                     {!isLoadingQuiz && totalQuestions > 0 && (
-                      <div style={{ marginTop: '50px', paddingTop: '20px', borderTop: '2px solid #1e5631', textAlign: 'right' }}>
-                        <p style={{ color: '#666', fontSize: '0.9rem', marginBottom: '10px' }}>
-                          {allAnswered ? 'All questions answered. You may submit the module.' : `Please answer all ${totalQuestions} questions to complete the module.`}
+                      <div style={{ marginTop: '40px', paddingTop: '20px', borderTop: '2px solid #1e5631', textAlign: isMobile ? 'left' : 'right' }}>
+                        <p style={{ color: '#666', fontSize: '0.9rem', marginBottom: '12px' }}>
+                          {allAnswered ? 'All questions answered. You may submit the module.' : `Please answer all questions to complete the module.`}
                         </p>
                         <button 
                           onClick={handleFinalSubmit}
@@ -519,7 +567,8 @@ export default function App() {
                             backgroundColor: allAnswered ? '#1e5631' : '#9e9e9e',
                             cursor: allAnswered ? 'pointer' : 'not-allowed',
                             padding: '12px 24px',
-                            fontSize: '1.1rem'
+                            fontSize: '1.05rem',
+                            width: isMobile ? '100%' : 'auto'
                           }}
                         >
                           Final Submit & View Results
@@ -538,7 +587,7 @@ export default function App() {
   );
 }
 
-function TrackedPdfPage({ pageNumber, index, rootRef, pageRefs, setCurrentPageIdx }) {
+function TrackedPdfPage({ pageNumber, index, rootRef, pageRefs, setCurrentPageIdx, isMobile }) {
   const elementRef = useRef(null);
 
   useEffect(() => {
@@ -555,7 +604,7 @@ function TrackedPdfPage({ pageNumber, index, rootRef, pageRefs, setCurrentPageId
       },
       {
         root: rootRef.current,
-        threshold: 0.3, 
+        threshold: 0.2, 
       }
     );
 
@@ -566,19 +615,22 @@ function TrackedPdfPage({ pageNumber, index, rootRef, pageRefs, setCurrentPageId
     };
   }, [index, rootRef, pageRefs, setCurrentPageIdx]);
 
+  // Calculate safe bounding width for mobile to ensure the canvas doesn't clip offscreen edges
+  const calculatedWidth = isMobile ? Math.min(600, window.innerWidth - 40) : 600;
+
   return (
     <div 
       ref={elementRef} 
-      style={{ boxShadow: '0 6px 16px rgba(0,0,0,0.2)', borderRadius: '4px', backgroundColor: '#fff', marginBottom: '10px' }}
+      style={{ boxShadow: '0 4px 12px rgba(0,0,0,0.15)', borderRadius: '4px', backgroundColor: '#fff', marginBottom: '10px' }}
     >
       <Page 
         pageNumber={pageNumber} 
-        width={600} 
+        width={calculatedWidth} 
         renderTextLayer={false} 
         renderAnnotationLayer={false} 
       />
     </div>
-  );
+  ); 
 }
 
 // --- CSS-IN-JS INLINE STYLES ---
@@ -587,14 +639,14 @@ const navHeaderStyle = { display: 'flex', justifyContent: 'space-between', align
 const navLinkStyle = (isActive) => ({ background: 'none', border: 'none', borderBottom: isActive ? '2px solid #1e5631' : '2px solid transparent', color: isActive ? '#1e5631' : '#555', fontWeight: isActive ? 'bold' : 'normal', cursor: 'pointer', padding: '8px 12px', fontSize: '1rem' });
 const dropdownMenuStyle = { position: 'absolute', top: '100%', left: '0', backgroundColor: '#ffffff', border: '1px solid #e0e0e0', borderRadius: '4px', boxShadow: '0 4px 6px rgba(0,0,0,0.1)', display: 'flex', flexDirection: 'column', minWidth: '150px', zIndex: 1000, overflow: 'hidden' };
 const dropdownItemStyle = { background: 'none', border: 'none', padding: '12px 16px', textAlign: 'left', cursor: 'pointer', fontSize: '0.95rem', color: '#555', borderBottom: '1px solid #eee', width: '100%' };
-const cardStyle = { backgroundColor: '#ffffff', border: '1px solid #e0e0e0', borderRadius: '6px', padding: '24px', marginBottom: '20px', boxShadow: '0 2px 4px rgba(0,0,0,0.02)' };
-const teamCardStyle = { display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', padding: '20px', backgroundColor: '#f9fafb', borderRadius: '8px', border: '1px solid #eee' };
+const cardStyle = { backgroundColor: '#ffffff', border: '1px solid #e0e0e0', borderRadius: '6px', padding: '24px', marginBottom: '20px', boxShadow: '0 2px 4px rgba(0,0,0,0.02)', boxSizing: 'border-box' };
+const teamCardStyle = { display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', padding: '20px', backgroundColor: '#f9fafb', borderRadius: '8px', border: '1px solid #eee', boxSizing: 'border-box' };
 const teamPhotoStyle = { width: '120px', height: '120px', borderRadius: '50%', objectFit: 'cover', border: '3px solid #1e5631' };
-const primaryBtnStyle = { padding: '10px 20px', backgroundColor: '#1e5631', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: '500', fontSize: '0.95rem', transition: 'background-color 0.2s' };
+const primaryBtnStyle = { padding: '10px 20px', backgroundColor: '#1e5631', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: '500', fontSize: '0.95rem', transition: 'background-color 0.2s', boxSizing: 'border-box' };
 const resetOutlineBtnStyle = { padding: '8px 12px', color: '#d32f2f', border: '1px solid #d32f2f', backgroundColor: 'transparent', borderRadius: '4px', cursor: 'pointer', fontSize: '0.9rem' };
 const backBtnStyle = { background: 'transparent', border: 'none', color: '#1e5631', cursor: 'pointer', fontSize: '1rem', fontWeight: '500', padding: 0 };
 const viewerToolbarStyle = { backgroundColor: '#2a3137', color: '#dfdfdf', display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 16px', userSelect: 'none' };
 const pageInputStyle = { width: '45px', background: '#1a1f22', color: '#fff', border: '1px solid #555', borderRadius: '4px', textAlign: 'center', fontSize: '0.85rem', padding: '3px 0', fontWeight: 'bold', MozAppearance: 'textfield' };
 const toolbarBtnStyle = { background: '#3a4147', color: '#fff', border: 'none', padding: '6px 10px', cursor: 'pointer', borderRadius: '4px', fontSize: '0.85rem', display: 'flex', alignItems: 'center', justifyContent: 'center' };
-const slideContentCanvasStyle = { flex: 1, padding: '30px 20px', display: 'flex', justifyContent: 'center', alignItems: 'flex-start', overflowY: 'auto',overflowX: 'auto', maxHeight: '550px' };
+const slideContentCanvasStyle = { flex: 1, padding: '30px 20px', display: 'flex', justifyContent: 'center', alignItems: 'flex-start', overflowY: 'auto', overflowX: 'auto', maxHeight: '550px' };
 const dividerStyle = { border: 'none', borderTop: '1px solid #e0e0e0', marginTop: '25px', marginBottom: '25px' };
