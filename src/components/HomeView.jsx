@@ -32,8 +32,8 @@ export default function HomeView({ setView, isMobile }) {
               <div><div style={{ fontSize: '1.8rem', fontWeight: 'bold', color: '#1e5631' }}>100%</div><div style={{ fontSize: '0.9rem', color: '#333' }}>Free</div></div>
             </div>
           </div>
-          <div style={{ height: '390px', width: '550px' }}>
-            <img src="random/test_random.jpeg" alt="Climate Academy Classroom" style={{ width: '100%', height: "100%", objectFit: 'fill', display: 'block' }} />
+          <div style={{ height: isMobile? 'auto': '390px', width: isMobile? 'auto': '550px'}}>
+            <img src="random/test_random.jpeg" alt="Climate Academy Classroom" style={{ width: isMobile? 'auto': '100%', height: isMobile? 'auto': "100%", objectFit: 'fill', display: 'block' }} />
           </div>
         </div>
       </section>
