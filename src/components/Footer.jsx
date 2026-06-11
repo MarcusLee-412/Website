@@ -26,8 +26,8 @@ export default function Footer({ isMobile }) {
         {/* Collaborator 1 */}
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
           <img src="teamphotos/ZS.jpeg" alt="Zeshan Foundation" style={{ width: '180px', height: '90px', objectFit: 'contain', backgroundColor: '#fff', margin: '0 auto 10px auto' }} />
-          <h4 style={{ margin: '0 0 5px 0' }}>CarbonCare InnoLab</h4>
-          <p style={{ fontSize: '0.85rem', color: '#555' }}>In Association with.</p>
+          <h4 style={{ margin: '0 0 5px 0' }}>ZeShan Foundation</h4>
+          <p style={{ fontSize: '0.85rem', color: '#555' }}>Funded by.</p>
         </div>
 
         {/* Collaborator 2 */}
